@@ -69,7 +69,7 @@ jobs:
 
       - name: Publish report to Google Docs
         id: publish_docs
-        if: steps.check_report.outputs.generated == 'true' && secrets.GOOGLE_SERVICE_ACCOUNT_JSON != ''
+        if: steps.check_report.outputs.generated == 'true'
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           GOOGLE_DOC_ID: ${{ secrets.GOOGLE_DOC_ID }}
@@ -77,6 +77,11 @@ jobs:
           GOOGLE_DOC_SHARE_EMAILS: ${{ secrets.GOOGLE_DOC_SHARE_EMAILS }}
           GOOGLE_DOC_TITLE_TEMPLATE: ${{ vars.GOOGLE_DOC_TITLE_TEMPLATE }}
         run: |
+          if [ -z "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "GOOGLE_SERVICE_ACCOUNT_JSON is not configured; skipping Google Docs publish."
+            exit 0
+          fi
+
           creds_path="$(mktemp)"
           printf '%s' "$GOOGLE_SERVICE_ACCOUNT_JSON" > "$creds_path"
           link_path="$(mktemp)"
@@ -102,11 +107,6 @@ jobs:
           "${cmd[@]}"
           echo "url=$(<"$link_path")" >> "$GITHUB_OUTPUT"
           rm -f "$creds_path" "$link_path"
-
-      - name: Skip Google Docs publish (missing credentials)
-        if: steps.check_report.outputs.generated == 'true' && secrets.GOOGLE_SERVICE_ACCOUNT_JSON == ''
-        run: |
-          echo "GOOGLE_SERVICE_ACCOUNT_JSON is not configured; skipping Google Docs publish."
 
       - name: Add Google Doc link to job summary
         if: steps.publish_docs.outputs.url != ''
