@@ -79,6 +79,8 @@ jobs:
         run: |
           if [ -z "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
             echo "GOOGLE_SERVICE_ACCOUNT_JSON is not configured; skipping Google Docs publish."
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            echo "reason=missing_service_account_secret" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -105,14 +107,29 @@ jobs:
           fi
 
           "${cmd[@]}"
-          echo "url=$(<"$link_path")" >> "$GITHUB_OUTPUT"
+          doc_url="$(tr -d '\r\n' < "$link_path")"
+          if [ -z "$doc_url" ] && [ -n "$GOOGLE_DOC_ID" ]; then
+            doc_url="https://docs.google.com/document/d/$GOOGLE_DOC_ID/edit"
+          fi
+
+          echo "published=true" >> "$GITHUB_OUTPUT"
+          echo "reason=published" >> "$GITHUB_OUTPUT"
+          echo "url=$doc_url" >> "$GITHUB_OUTPUT"
           rm -f "$creds_path" "$link_path"
 
-      - name: Add Google Doc link to job summary
-        if: steps.publish_docs.outputs.url != ''
+      - name: Add Google Docs publish status to summary
+        if: steps.check_report.outputs.generated == 'true'
         run: |
-          echo "### Published Google Doc" >> "$GITHUB_STEP_SUMMARY"
-          echo "${{ steps.publish_docs.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Google Docs Publish" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.publish_docs.outputs.published }}" = "true" ]; then
+            if [ -n "${{ steps.publish_docs.outputs.url }}" ]; then
+              echo "Published: ${{ steps.publish_docs.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "Published successfully, but no URL was returned." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            echo "Skipped: ${{ steps.publish_docs.outputs.reason }}" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Commit generated report if changed
         if: steps.check_report.outputs.generated == 'true'
