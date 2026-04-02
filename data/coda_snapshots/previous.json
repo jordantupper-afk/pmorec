@@ -1,0 +1,112 @@
+{
+  "metadata": {
+    "source_url": "https://coda.io/d/Developer-Platform-Mission_dLGZ7ZRwER_/2026-Developer-Platforms-OKRs-Initiatives_suSYCzE2#_lusqZqZ0",
+    "exported_at": "2026-03-27T15:00:00Z",
+    "period": "H1 2026",
+    "prepared_by": "Developer Platform PM"
+  },
+  "okrs": [
+    {
+      "id": "OKR-1",
+      "name": "Improve build and deploy reliability",
+      "owner": "Platform Eng",
+      "status": "at_risk",
+      "progress": 52,
+      "confidence": 0.62
+    },
+    {
+      "id": "OKR-2",
+      "name": "Reduce time-to-first-commit for new engineers",
+      "owner": "Dev Experience",
+      "status": "on_track",
+      "progress": 61,
+      "confidence": 0.74
+    },
+    {
+      "id": "OKR-3",
+      "name": "Platform cost efficiency improvements",
+      "owner": "Infra",
+      "status": "at_risk",
+      "progress": 41,
+      "confidence": 0.55
+    }
+  ],
+  "initiatives": [
+    {
+      "id": "INIT-101",
+      "okr_id": "OKR-1",
+      "name": "CI flaky test remediation wave 1",
+      "owner": "QA Platform",
+      "status": "at_risk",
+      "progress": 44,
+      "next_milestone": "Top 50 flaky tests fixed",
+      "decision_required": false
+    },
+    {
+      "id": "INIT-102",
+      "okr_id": "OKR-1",
+      "name": "Progressive delivery guardrails",
+      "owner": "Release Eng",
+      "status": "on_track",
+      "progress": 68,
+      "next_milestone": "Canary policy in all tier-1 services",
+      "decision_required": false
+    },
+    {
+      "id": "INIT-201",
+      "okr_id": "OKR-2",
+      "name": "One-click dev environment bootstrap",
+      "owner": "DevEx",
+      "status": "on_track",
+      "progress": 71,
+      "next_milestone": "Pilot for 2 teams",
+      "decision_required": false
+    },
+    {
+      "id": "INIT-301",
+      "okr_id": "OKR-3",
+      "name": "Idle resource cleanup automation",
+      "owner": "Cloud Infra",
+      "status": "at_risk",
+      "progress": 37,
+      "next_milestone": "Enable auto-cleanup in staging",
+      "decision_required": true,
+      "decision_summary": "Approve temporary freeze window for cleanup rollout.",
+      "decision_due": "2026-04-11"
+    }
+  ],
+  "risks": [
+    {
+      "id": "RISK-1",
+      "title": "Critical CI lane remains unstable",
+      "owner": "QA Platform",
+      "severity": 4,
+      "likelihood": 3,
+      "status": "open",
+      "mitigation": "Dedicated tiger team and daily triage.",
+      "decision_required": false
+    },
+    {
+      "id": "RISK-2",
+      "title": "Delayed security review for guardrails",
+      "owner": "Release Eng",
+      "severity": 3,
+      "likelihood": 2,
+      "status": "watch",
+      "mitigation": "Escalated with Security PM.",
+      "decision_required": false
+    },
+    {
+      "id": "RISK-3",
+      "title": "Cloud spend spikes from orphaned environments",
+      "owner": "Cloud Infra",
+      "severity": 4,
+      "likelihood": 4,
+      "status": "open",
+      "mitigation": "Enforce TTL tags and weekly cleanup.",
+      "decision_required": true,
+      "decision_summary": "Approve policy for automatic shutdown enforcement.",
+      "decision_due": "2026-04-12"
+    }
+  ]
+}

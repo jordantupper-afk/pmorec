@@ -1,0 +1,76 @@
+name: Biweekly CTO OKR Report
+
+on:
+  schedule:
+    # Run weekly; the report script enforces every-14-days cadence from 2026-04-10.
+    - cron: "0 14 * * 5"
+  workflow_dispatch:
+    inputs:
+      report_date:
+        description: "Report date (YYYY-MM-DD). Optional."
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Resolve report date
+        id: report_date
+        run: |
+          if [ -n "${{ github.event.inputs.report_date }}" ]; then
+            echo "value=${{ github.event.inputs.report_date }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve report path
+        id: report_path
+        run: |
+          echo "value=reports/cto/okr-update-${{ steps.report_date.outputs.value }}.md" >> "$GITHUB_OUTPUT"
+
+      - name: Generate biweekly report
+        run: |
+          mkdir -p reports/cto
+          python scripts/generate_cto_okr_report.py \
+            --current data/coda_snapshots/current.json \
+            --previous data/coda_snapshots/previous.json \
+            --output "${{ steps.report_path.outputs.value }}" \
+            --report-date "${{ steps.report_date.outputs.value }}"
+
+      - name: Check if report was generated
+        id: check_report
+        run: |
+          if [ -f "${{ steps.report_path.outputs.value }}" ]; then
+            echo "generated=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "generated=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update latest symlink copy
+        if: steps.check_report.outputs.generated == 'true'
+        run: |
+          cp "${{ steps.report_path.outputs.value }}" reports/cto/latest.md
+
+      - name: Commit generated report if changed
+        if: steps.check_report.outputs.generated == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add reports/cto
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: generate CTO OKR report for ${{ steps.report_date.outputs.value }}"
+            git push
+          else
+            echo "No report changes to commit."
+          fi

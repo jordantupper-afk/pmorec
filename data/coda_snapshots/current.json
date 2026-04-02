@@ -1,0 +1,102 @@
+{
+  "metadata": {
+    "source_url": "https://coda.io/d/Developer-Platform-Mission_dLGZ7ZRwER_/2026-Developer-Platforms-OKRs-Initiatives_suSYCzE2#_lusqZqZ0",
+    "snapshot_date": "2026-04-10",
+    "period": "H1 2026",
+    "prepared_by": "Program Manager"
+  },
+  "okrs": [
+    {
+      "id": "OKR-1",
+      "name": "Improve platform developer productivity",
+      "owner": "DevEx",
+      "status": "on_track",
+      "progress": 62,
+      "confidence": 4
+    },
+    {
+      "id": "OKR-2",
+      "name": "Increase CI reliability and speed",
+      "owner": "Platform Infra",
+      "status": "at_risk",
+      "progress": 48,
+      "confidence": 3
+    },
+    {
+      "id": "OKR-3",
+      "name": "Strengthen platform security posture",
+      "owner": "Security Platform",
+      "status": "off_track",
+      "progress": 34,
+      "confidence": 2
+    }
+  ],
+  "initiatives": [
+    {
+      "id": "INIT-1",
+      "okr_id": "OKR-1",
+      "name": "Self-service environment bootstrap",
+      "owner": "DevEx",
+      "status": "on_track",
+      "progress": 70,
+      "next_milestone": "GA template catalog",
+      "decision_required": false
+    },
+    {
+      "id": "INIT-2",
+      "okr_id": "OKR-2",
+      "name": "Flaky test reduction program",
+      "owner": "QA Platform",
+      "status": "at_risk",
+      "progress": 42,
+      "next_milestone": "Top 20 flaky suites remediated",
+      "decision_required": true,
+      "decision_summary": "Approve temporary freeze on non-critical test additions for 2 sprints.",
+      "decision_due": "2026-04-15"
+    },
+    {
+      "id": "INIT-3",
+      "okr_id": "OKR-3",
+      "name": "Runtime dependency hardening",
+      "owner": "Security Platform",
+      "status": "off_track",
+      "progress": 25,
+      "next_milestone": "SBOM policy enforcement in CI",
+      "decision_required": true,
+      "decision_summary": "Decide on mandatory dependency pinning policy scope for all services.",
+      "decision_due": "2026-04-18"
+    }
+  ],
+  "risks": [
+    {
+      "id": "RISK-1",
+      "title": "Security remediation backlog exceeds capacity",
+      "owner": "Security Platform",
+      "severity": 5,
+      "likelihood": 4,
+      "status": "open",
+      "mitigation": "Reallocate 2 engineers from infra migration for 1 cycle.",
+      "decision_required": true,
+      "decision_summary": "Approve temporary staffing rebalance.",
+      "decision_due": "2026-04-12"
+    },
+    {
+      "id": "RISK-2",
+      "title": "CI queue times increase with monorepo growth",
+      "owner": "Platform Infra",
+      "severity": 4,
+      "likelihood": 3,
+      "status": "open",
+      "mitigation": "Introduce dynamic executor scaling and test sharding."
+    },
+    {
+      "id": "RISK-3",
+      "title": "Service teams delay adoption of new golden paths",
+      "owner": "DevEx",
+      "severity": 3,
+      "likelihood": 3,
+      "status": "monitoring",
+      "mitigation": "Expand onboarding office hours and adoption playbooks."
+    }
+  ]
+}
