@@ -25,6 +25,11 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install reporting dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install google-api-python-client google-auth
+
       - name: Resolve report date
         id: report_date
         run: |
@@ -61,6 +66,53 @@ jobs:
         if: steps.check_report.outputs.generated == 'true'
         run: |
           cp "${{ steps.report_path.outputs.value }}" reports/cto/latest.md
+
+      - name: Publish report to Google Docs
+        id: publish_docs
+        if: steps.check_report.outputs.generated == 'true' && secrets.GOOGLE_SERVICE_ACCOUNT_JSON != ''
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_DOC_ID: ${{ secrets.GOOGLE_DOC_ID }}
+          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+          GOOGLE_DOC_SHARE_EMAILS: ${{ secrets.GOOGLE_DOC_SHARE_EMAILS }}
+          GOOGLE_DOC_TITLE_TEMPLATE: ${{ vars.GOOGLE_DOC_TITLE_TEMPLATE }}
+        run: |
+          creds_path="$(mktemp)"
+          printf '%s' "$GOOGLE_SERVICE_ACCOUNT_JSON" > "$creds_path"
+          link_path="$(mktemp)"
+
+          title_template="${GOOGLE_DOC_TITLE_TEMPLATE:-Developer Platform OKR Update - {report_date}}"
+          cmd=(python scripts/publish_report_to_google_docs.py
+            --report-path "${{ steps.report_path.outputs.value }}"
+            --credentials-file "$creds_path"
+            --report-date "${{ steps.report_date.outputs.value }}"
+            --title-template "$title_template"
+            --output-link-file "$link_path")
+
+          if [ -n "$GOOGLE_DOC_ID" ]; then
+            cmd+=(--doc-id "$GOOGLE_DOC_ID")
+          fi
+          if [ -n "$GOOGLE_DRIVE_FOLDER_ID" ]; then
+            cmd+=(--folder-id "$GOOGLE_DRIVE_FOLDER_ID")
+          fi
+          if [ -n "$GOOGLE_DOC_SHARE_EMAILS" ]; then
+            cmd+=(--share-emails "$GOOGLE_DOC_SHARE_EMAILS")
+          fi
+
+          "${cmd[@]}"
+          echo "url=$(<"$link_path")" >> "$GITHUB_OUTPUT"
+          rm -f "$creds_path" "$link_path"
+
+      - name: Skip Google Docs publish (missing credentials)
+        if: steps.check_report.outputs.generated == 'true' && secrets.GOOGLE_SERVICE_ACCOUNT_JSON == ''
+        run: |
+          echo "GOOGLE_SERVICE_ACCOUNT_JSON is not configured; skipping Google Docs publish."
+
+      - name: Add Google Doc link to job summary
+        if: steps.publish_docs.outputs.url != ''
+        run: |
+          echo "### Published Google Doc" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.publish_docs.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit generated report if changed
         if: steps.check_report.outputs.generated == 'true'

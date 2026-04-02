@@ -98,6 +98,54 @@ Behavior:
 - Generates report **only** when `report-date` aligns with 14-day cadence from 2026-04-10
 - Commits report updates automatically when generated
 - Supports manual `workflow_dispatch` with optional `report_date`
+- Publishes generated report to Google Docs (when credentials are configured)
+
+## Google Docs publishing (Option 2 - automated)
+
+The workflow can automatically publish each generated report to Google Docs.
+
+### One-time Google Cloud setup
+
+1. In Google Cloud, enable APIs:
+   - Google Docs API
+   - Google Drive API
+2. Create a Service Account and generate a JSON key.
+3. Share your target Google Doc (or target Drive folder) with the service account email.
+4. Add repository secrets/variables:
+   - `GOOGLE_SERVICE_ACCOUNT_JSON` (**required**): full JSON credentials content
+   - `GOOGLE_DOC_ID` (optional): existing doc ID to overwrite each cycle (rolling doc mode)
+   - `GOOGLE_DRIVE_FOLDER_ID` (optional): folder for newly created docs
+   - `GOOGLE_DOC_SHARE_EMAILS` (optional): comma-separated readers to grant access
+   - `GOOGLE_DOC_TITLE_TEMPLATE` (optional repo variable): default `Developer Platform OKR Update - {report_date}`
+
+### Publish modes
+
+- **Rolling single doc** (recommended for CTO bookmark):
+  - Set `GOOGLE_DOC_ID`
+  - Each cycle overwrites the same Google Doc with latest content
+- **New doc each cycle**:
+  - Leave `GOOGLE_DOC_ID` unset
+  - Script creates a new Google Doc titled from template and optionally moves it to `GOOGLE_DRIVE_FOLDER_ID`
+
+### Local/manual publish command
+
+```bash
+python3 scripts/publish_report_to_google_docs.py \
+  --report-path reports/cto/okr-update-2026-04-10.md \
+  --credentials-file /path/to/service-account.json \
+  --report-date 2026-04-10 \
+  --doc-id <existing-doc-id>
+```
+
+Or create a new doc:
+
+```bash
+python3 scripts/publish_report_to_google_docs.py \
+  --report-path reports/cto/okr-update-2026-04-10.md \
+  --credentials-file /path/to/service-account.json \
+  --report-date 2026-04-10 \
+  --folder-id <drive-folder-id>
+```
 
 ## Operating cadence every 2 weeks
 

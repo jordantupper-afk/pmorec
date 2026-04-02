@@ -5,6 +5,7 @@ Automated biweekly reporting for Developer Platform OKRs and initiatives.
 ## Included workflow
 
 - `scripts/generate_cto_okr_report.py` - generates a CTO-ready markdown update.
+- `scripts/publish_report_to_google_docs.py` - publishes generated report to Google Docs.
 - `.github/workflows/biweekly-cto-okr-report.yml` - scheduled GitHub Action.
 - `docs/cto-biweekly-okr-reporting.md` - operating guide and data contract.
 
