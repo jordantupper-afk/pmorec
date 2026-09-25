@@ -1,4 +1,4 @@
-# Developer Platform OKR Update - 2026-09-11
+# Developer Platform OKR Update - 2026-09-25
 
 **Source of truth:** https://coda.io/d/Developer-Platform-Mission_dLGZ7ZRwER_/2026-Developer-Platforms-OKRs-Initiatives_suSYCzE2#_lusqZqZ0
 
